@@ -26,7 +26,7 @@ df_wine = pd.read_csv('https://archive.ics.uci.edu/ml/'
                       'machine-learning-databases/wine/wine.data',
                       header=None)
 
-num_classes = 13
+num_features = 13
 
 
 # データの取り出し
@@ -45,27 +45,27 @@ X_test_std = sc.transform(X_test)
 
 
 # Logistic Regressionによる訓練および評価
-kpca_list = [KernelPCA(n_components=i+1, kernel="rbf") for i in range(num_classes-1)]
-lle_list = [LocallyLinearEmbedding(n_components=i+1) for i in range(num_classes-1)]
-mds_list = [MDS(n_components=i+1) for i in range(num_classes-1)]
-ism_list = [Isomap(n_components=i+1) for i in range(num_classes-1)]
-sample_dimensions = [i for i in range(num_classes)]
+kpca_list = [KernelPCA(n_components=i+1, kernel="rbf") for i in range(num_features-1)]
+lle_list = [LocallyLinearEmbedding(n_components=i+1) for i in range(num_features-1)]
+mds_list = [MDS(n_components=i+1) for i in range(num_features-1)]
+ism_list = [Isomap(n_components=i+1) for i in range(num_features-1)]
+sample_dimensions = [i for i in range(num_features)]
 random.shuffle(sample_dimensions)
 
-# 1次元〜(num_classes-1)次元まで削減した各々のデータを格納
-X_kpca_train = [kpca_list[i].fit_transform(X_train_std) for i in range(num_classes - 1)]
-X_kpca_test = [kpca_list[i].transform(X_test_std) for i in range(num_classes -1)]
+# 1次元〜(num_features-1)次元まで削減した各々のデータを格納
+X_kpca_train = [kpca_list[i].fit_transform(X_train_std) for i in range(num_features - 1)]
+X_kpca_test = [kpca_list[i].transform(X_test_std) for i in range(num_features -1)]
 
-X_lle_train = [lle_list[i].fit_transform(X_train_std) for i in range(num_classes - 1)]
-X_lle_test = [lle_list[i].transform(X_test_std) for i in range(num_classes -1)]
+X_lle_train = [lle_list[i].fit_transform(X_train_std) for i in range(num_features - 1)]
+X_lle_test = [lle_list[i].transform(X_test_std) for i in range(num_features -1)]
 
-X_mds_train = [mds_list[i].fit_transform(X_train_std) for i in range(num_classes - 1)]
+X_mds_train = [mds_list[i].fit_transform(X_train_std) for i in range(num_features - 1)]
 
-X_ism_train = [ism_list[i].fit_transform(X_train_std) for i in range(num_classes - 1)]
-X_ism_test = [ism_list[i].transform(X_test_std) for i in range(num_classes -1)]
+X_ism_train = [ism_list[i].fit_transform(X_train_std) for i in range(num_features - 1)]
+X_ism_test = [ism_list[i].transform(X_test_std) for i in range(num_features -1)]
 
-X_rand_train = [X_train_std[:, sample_dimensions[:i+1]] for i in range(num_classes -1)]
-X_rand_test = [X_test_std[:, sample_dimensions[:i+1]] for i in range(num_classes - 1)]
+X_rand_train = [X_train_std[:, sample_dimensions[:i+1]] for i in range(num_features -1)]
+X_rand_test = [X_test_std[:, sample_dimensions[:i+1]] for i in range(num_features - 1)]
 
 kpca_train_score, kpca_test_score = [], []
 lle_train_score, lle_test_score = [], []
@@ -74,7 +74,7 @@ ism_train_score, ism_test_score = [], []
 rand_train_score, rand_test_score = [], []
 
 lr = LogisticRegression()
-for i in range(num_classes-1):
+for i in range(num_features-1):
     kpca_lr = lr.fit(X_kpca_train[i], y_train)
     kpca_train_score.append(kpca_lr.score(X_kpca_train[i], y_train))
     kpca_test_score.append(kpca_lr.score(X_kpca_test[i], y_test))
@@ -95,7 +95,7 @@ for i in range(num_classes-1):
     rand_test_score.append(rand_lr.score(X_rand_test[i], y_test))
 
 # 比較グラフの描画
-dimensions = [i+1 for i in range(num_classes-1)]
+dimensions = [i+1 for i in range(num_features-1)]
 
 fig, (axL, axR) = plt.subplots(ncols=2, figsize=(18,8))
 
